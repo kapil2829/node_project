@@ -4,6 +4,10 @@ const mongoose = require('mongoose');
 const passport = require("passport");
 const session = require('express-session');
 const localStrategy = require('passport-local').Strategy;
+const bodyParser = require('body-parser');
+
+server.use(bodyParser.urlencoded({ extended: false }));
+server.use(bodyParser.json());
 
 require('dotenv').config();
 
@@ -47,6 +51,7 @@ passport.deserializeUser(User.deserializeUser());
 
 
 server.set('view engine', 'ejs');
+
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
 
@@ -74,7 +79,7 @@ server.post('/login',passport.authenticate('local', {
 
 
 
-server.post('/register', async (req, res) => {
+server.post('/register',  async (req, res) => {
 	try {
 		let user = new User({
             username : req.body.username,
@@ -94,14 +99,17 @@ server.post('/register', async (req, res) => {
 				return res.redirect('/register');
 			}
 			
-			res.redirect('/login');
+			return res.json(user);
+			return res.redirect('/all_user');
 		});
 		
 		await user.save();	
+		
+
 	} catch (error) {
 	
 		console.log(error);
-		return res.redirect('/register');
+		return res.send('error ');
 	}
 });
 
